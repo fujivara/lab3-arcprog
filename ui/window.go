@@ -117,7 +117,23 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 
 	case mouse.Event:
 		if t == nil {
-			// TODO: Реалізувати реакцію на натискання кнопки миші.
+			if e.Button == mouse.ButtonRight && e.Direction == mouse.DirPress {
+				pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src)
+
+				squareWidth := 400
+				squareHeight := 200
+
+				centerPoint := image.Pt(int(e.X), int(e.Y))
+
+				posX1 := centerPoint.X - squareWidth/2
+				posY1 := centerPoint.Y - squareHeight/2
+
+				posX2 := centerPoint.X - squareHeight/2
+				posY2 := centerPoint.Y - squareWidth/2
+
+				drawCrossByCoords(pw, posX1, posY1, posX2, posY2, squareHeight, squareWidth)
+			}
+
 		}
 
 	case paint.Event:
@@ -150,13 +166,27 @@ func (pw *Visualizer) drawDefaultUI() {
 	posX2 := (winWidth - squareHeight) / 2
 	posY2 := (winHeight - squareWidth) / 2
 
+	drawCrossByCoords(pw, posX1, posY1, posX2, posY2, squareHeight, squareWidth)
+}
+
+func drawCrossByCoords(
+	pw *Visualizer,
+	posX1 int,
+	posY1 int,
+	posX2 int,
+	posY2 int,
+	squareHeight int,
+	squareWidth int,
+) {
+	yellow := color.RGBA{R: 255, G: 255, B: 0, A: 255}
+
 	// Малювання першого квадрата.
 	square1 := image.Rect(posX1, posY1, posX1+squareWidth, posY1+squareHeight)
-	pw.w.Fill(square1, color.Black, draw.Src)
+	pw.w.Fill(square1, yellow, draw.Src)
 
 	// Малювання другого квадрата.
 	square2 := image.Rect(posX2, posY2, posX2+squareHeight, posY2+squareWidth)
-	pw.w.Fill(square2, color.Black, draw.Src)
+	pw.w.Fill(square2, yellow, draw.Src)
 
 	// Малювання білої рамки.
 	for _, br := range imageutil.Border(pw.sz.Bounds(), 10) {
