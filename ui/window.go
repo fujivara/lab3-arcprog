@@ -29,7 +29,7 @@ func getCross(x int, y int) *Cross {
 	}
 }
 
-func (cross *Cross) draw(t screen.Texture) {
+func (cross *Cross) Draw(t screen.Texture) {
 	t.Fill(
 		image.Rect(
 			cross.x-cross.width/2,

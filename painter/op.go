@@ -1,6 +1,7 @@
 package painter
 
 import (
+	"image"
 	"image/color"
 
 	"golang.org/x/exp/shiny/screen"
@@ -9,17 +10,24 @@ import (
 // Operation змінює вхідну текстуру.
 type Operation interface {
 	// Do виконує зміну операції, повертаючи true, якщо текстура вважається готовою для відображення.
-	Do(t screen.Texture) (ready bool)
+	Do(t screen.Texture, state *UI) (ready bool)
 }
 
 // OperationList групує список операції в одну.
 type OperationList []Operation
 
-func (ol OperationList) Do(t screen.Texture) (ready bool) {
-	for _, o := range ol {
-		ready = o.Do(t) || ready
+func (ol OperationList) Do(t screen.Texture, state *UI) bool {
+	t.Fill(t.Bounds(), state.bg, screen.Src)
+	t.Fill(image.Rectangle{
+		Min: state.bgFigure[0],
+		Max: state.bgFigure[1],
+	}, color.Black, screen.Src)
+
+	for _, cross := range state.crosses {
+		cross.Draw(t)
 	}
-	return
+
+	return true
 }
 
 // UpdateOp операція, яка не змінює текстуру, але сигналізує, що текстуру потрібно розглядати як готову.
@@ -27,13 +35,13 @@ var UpdateOp = updateOp{}
 
 type updateOp struct{}
 
-func (op updateOp) Do(t screen.Texture) bool { return true }
+func (op updateOp) Do(t screen.Texture, state *UI) bool { return true }
 
 // OperationFunc використовується для перетворення функції оновлення текстури в Operation.
-type OperationFunc func(t screen.Texture)
+type OperationFunc func(t screen.Texture, state *UI)
 
-func (f OperationFunc) Do(t screen.Texture) bool {
-	f(t)
+func (f OperationFunc) Do(t screen.Texture, state *UI) bool {
+	//f(t)
 	return false
 }
 
