@@ -1,12 +1,12 @@
 package ui
 
 import (
+	"golang.org/x/exp/shiny/imageutil"
 	"image"
 	"image/color"
 	"log"
 
 	"golang.org/x/exp/shiny/driver"
-	"golang.org/x/exp/shiny/imageutil"
 	"golang.org/x/exp/shiny/screen"
 	"golang.org/x/image/draw"
 	"golang.org/x/mobile/event/key"
@@ -15,6 +15,72 @@ import (
 	"golang.org/x/mobile/event/paint"
 	"golang.org/x/mobile/event/size"
 )
+
+type Cross struct {
+	x, y, size, width int
+}
+
+func getCross(x int, y int) *Cross {
+	return &Cross{
+		x:     x,
+		y:     y,
+		size:  400,
+		width: 100,
+	}
+}
+
+func (cross *Cross) draw(t screen.Texture) {
+	t.Fill(
+		image.Rect(
+			cross.x-cross.width/2,
+			cross.x-cross.width/2,
+			cross.y-cross.size/2,
+			cross.y-cross.size/2,
+		),
+		color.RGBA{R: 255, G: 255, A: 255},
+		draw.Src,
+	)
+
+	t.Fill(
+		image.Rect(
+			cross.x-cross.size/2,
+			cross.x-cross.size/2,
+			cross.y-cross.width/2,
+			cross.y-cross.width/2,
+		),
+		color.RGBA{R: 255, G: 255, A: 255},
+		draw.Src,
+	)
+}
+
+func (cross *Cross) visualize(pw *Visualizer) {
+	pw.w.Fill(
+		image.Rect(
+			cross.x,
+			cross.y-cross.size/2+cross.width/2,
+			cross.x-cross.size,
+			cross.y-cross.size/2-cross.width/2,
+		),
+		color.RGBA{R: 255, G: 255, A: 255},
+		draw.Src,
+	)
+
+	pw.w.Fill(
+		image.Rect(
+			cross.x+cross.size/2+cross.width/2,
+			cross.y,
+			cross.x+cross.size/2-cross.width/2,
+			cross.y-cross.size,
+		),
+		color.RGBA{R: 255, G: 255, A: 255},
+		draw.Src,
+	)
+}
+
+func (cross *Cross) position(x int, y int) {
+	cross.x = x - cross.size/2
+	cross.y = y - cross.size/2
+}
 
 type Visualizer struct {
 	Title         string
@@ -27,6 +93,9 @@ type Visualizer struct {
 
 	sz  size.Event
 	pos image.Rectangle
+
+	startSize int
+	crosses   []*Cross
 }
 
 func (pw *Visualizer) Main() {
@@ -47,6 +116,7 @@ func (pw *Visualizer) run(s screen.Screen) {
 		Width:  800,
 		Height: 800,
 	})
+	w.Send(paint.Event{})
 	if err != nil {
 		log.Fatal("Failed to initialize the app window:", err)
 	}
@@ -60,6 +130,8 @@ func (pw *Visualizer) run(s screen.Screen) {
 	}
 
 	pw.w = w
+	pw.crosses = []*Cross{{200, 200, 400, 100}}
+	pw.startSize = 400
 
 	events := make(chan any)
 	go func() {
@@ -118,20 +190,8 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 	case mouse.Event:
 		if t == nil {
 			if e.Button == mouse.ButtonRight && e.Direction == mouse.DirPress {
-				pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src)
-
-				squareWidth := 400
-				squareHeight := 200
-
-				centerPoint := image.Pt(int(e.X), int(e.Y))
-
-				posX1 := centerPoint.X - squareWidth/2
-				posY1 := centerPoint.Y - squareHeight/2
-
-				posX2 := centerPoint.X - squareHeight/2
-				posY2 := centerPoint.Y - squareWidth/2
-
-				drawCrossByCoords(pw, posX1, posY1, posX2, posY2, squareHeight, squareWidth)
+				pw.positionAll(int(e.X), int(e.Y))
+				pw.w.Send(paint.Event{})
 			}
 
 		}
@@ -149,47 +209,29 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 }
 
 func (pw *Visualizer) drawDefaultUI() {
-	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src) // Білий фон.
+	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src)
 
-	// Розміри квадратів.
-	squareWidth := 400
-	squareHeight := 200
+	for _, cross := range pw.crosses {
+		cross.visualize(pw)
+	}
 
-	// Розміри вікна.
-	winWidth := pw.sz.Bounds().Dx()
-	winHeight := pw.sz.Bounds().Dy()
-
-	// Обчислення позицій по центру вікна.
-	posX1 := (winWidth - squareWidth) / 2
-	posY1 := (winHeight - squareHeight) / 2
-
-	posX2 := (winWidth - squareHeight) / 2
-	posY2 := (winHeight - squareWidth) / 2
-
-	drawCrossByCoords(pw, posX1, posY1, posX2, posY2, squareHeight, squareWidth)
+	for _, border := range imageutil.Border(pw.sz.Bounds(), 10) {
+		pw.w.Fill(border, color.Black, draw.Src)
+	}
 }
 
-func drawCrossByCoords(
-	pw *Visualizer,
-	posX1 int,
-	posY1 int,
-	posX2 int,
-	posY2 int,
-	squareHeight int,
-	squareWidth int,
-) {
-	yellow := color.RGBA{R: 255, G: 255, B: 0, A: 255}
-
-	// Малювання першого квадрата.
-	square1 := image.Rect(posX1, posY1, posX1+squareWidth, posY1+squareHeight)
-	pw.w.Fill(square1, yellow, draw.Src)
-
-	// Малювання другого квадрата.
-	square2 := image.Rect(posX2, posY2, posX2+squareHeight, posY2+squareWidth)
-	pw.w.Fill(square2, yellow, draw.Src)
-
-	// Малювання білої рамки.
-	for _, br := range imageutil.Border(pw.sz.Bounds(), 10) {
-		pw.w.Fill(br, color.White, draw.Src)
+func (pw *Visualizer) positionAll(x int, y int) {
+	for _, cross := range pw.crosses {
+		cross.position(x, y)
 	}
+}
+
+func (pw *Visualizer) add(x int, y int) {
+	cross := &Cross{
+		x - pw.startSize/2,
+		y - pw.startSize,
+		pw.startSize,
+		100,
+	}
+	pw.crosses = append(pw.crosses, cross)
 }
