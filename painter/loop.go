@@ -82,7 +82,7 @@ func (mq *messageQueue) push(op Operation) {
 }
 
 func (mq *messageQueue) pull() Operation {
-	mq.mu.Unlock()
+	mq.mu.Lock()
 	defer mq.mu.Unlock()
 	if len(mq.operations) == 0 {
 		mq.mu.Unlock()
