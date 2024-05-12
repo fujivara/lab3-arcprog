@@ -20,7 +20,7 @@ type Cross struct {
 	x, y, size, width int
 }
 
-func getCross(x int, y int) *Cross {
+func GetCross(x int, y int) *Cross {
 	return &Cross{
 		x:     x,
 		y:     y,
