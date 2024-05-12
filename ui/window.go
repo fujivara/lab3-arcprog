@@ -57,9 +57,9 @@ func (cross *Cross) visualize(pw *Visualizer) {
 	pw.w.Fill(
 		image.Rect(
 			cross.x,
-			cross.y-cross.size/2+cross.width/2,
-			cross.x-cross.size,
-			cross.y-cross.size/2-cross.width/2,
+			cross.y+cross.size/2+cross.width/2,
+			cross.x+cross.size,
+			cross.y+cross.size/2-cross.width/2,
 		),
 		color.RGBA{R: 255, G: 255, A: 255},
 		draw.Src,
@@ -70,7 +70,7 @@ func (cross *Cross) visualize(pw *Visualizer) {
 			cross.x+cross.size/2+cross.width/2,
 			cross.y,
 			cross.x+cross.size/2-cross.width/2,
-			cross.y-cross.size,
+			cross.y+cross.size,
 		),
 		color.RGBA{R: 255, G: 255, A: 255},
 		draw.Src,
