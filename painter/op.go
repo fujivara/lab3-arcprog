@@ -89,12 +89,8 @@ func GreenFill(t screen.Texture, state *UI) {
 	state.bg = color.RGBA{G: 0xff, A: 0xff}
 }
 
-func BlackFill(t screen.Texture, state *UI) {
-	state.bg = color.Black
-}
-
 func Reset(t screen.Texture, state *UI) {
-	state.bg = color.Black
+	state.bg = color.White
 	state.bgFigure = [2]image.Point{{0, 0}, {0, 0}}
 	state.crosses = []*ui.Cross{}
 }
@@ -122,20 +118,20 @@ func DrawRectangle(args []string) OperationFunc {
 
 func Figure(args []string) OperationFunc {
 	if len(args) != 2 {
-		fmt.Println("Min amount of arguments is 2")
+		fmt.Println("Wrong amount of arguments to move figures")
+		return nil
 	}
 	floatArgs, err := convertArgs(args)
-
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
-
 	return func(t screen.Texture, state *UI) {
 		coords, err := getCoordsByArgs(t.Bounds().Dx(), t.Bounds().Dy(), floatArgs)
 		if err == nil && len(coords) == 2 {
 			cross := ui.GetCross(coords[0], coords[1])
 			state.crosses = append(state.crosses, cross)
+
 		}
 	}
 }

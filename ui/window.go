@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"golang.org/x/exp/shiny/imageutil"
 	"image"
 	"image/color"
 	"log"
@@ -33,9 +32,9 @@ func (cross *Cross) Draw(t screen.Texture) {
 	t.Fill(
 		image.Rect(
 			cross.x-cross.width/2,
-			cross.x-cross.width/2,
 			cross.y-cross.size/2,
-			cross.y-cross.size/2,
+			cross.x+cross.width/2,
+			cross.y+cross.size/2,
 		),
 		color.RGBA{R: 255, G: 255, A: 255},
 		draw.Src,
@@ -44,16 +43,16 @@ func (cross *Cross) Draw(t screen.Texture) {
 	t.Fill(
 		image.Rect(
 			cross.x-cross.size/2,
-			cross.x-cross.size/2,
 			cross.y-cross.width/2,
-			cross.y-cross.width/2,
+			cross.x+cross.size/2,
+			cross.y+cross.width/2,
 		),
 		color.RGBA{R: 255, G: 255, A: 255},
 		draw.Src,
 	)
 }
 
-func (cross *Cross) visualize(pw *Visualizer) {
+func (cross *Cross) Visualize(pw *Visualizer) {
 	pw.w.Fill(
 		image.Rect(
 			cross.x,
@@ -181,7 +180,7 @@ func detectTerminate(e any) bool {
 func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 	switch e := e.(type) {
 
-	case size.Event: // Оновлення даних про розмір вікна.
+	case size.Event:
 		pw.sz = e
 
 	case error:
@@ -197,11 +196,9 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 		}
 
 	case paint.Event:
-		// Малювання контенту вікна.
 		if t == nil {
 			pw.drawDefaultUI()
 		} else {
-			// Використання текстури отриманої через виклик Update.
 			pw.w.Scale(pw.sz.Bounds(), t, t.Bounds(), draw.Src, nil)
 		}
 		pw.w.Publish()
@@ -212,11 +209,7 @@ func (pw *Visualizer) drawDefaultUI() {
 	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src)
 
 	for _, cross := range pw.crosses {
-		cross.visualize(pw)
-	}
-
-	for _, border := range imageutil.Border(pw.sz.Bounds(), 10) {
-		pw.w.Fill(border, color.Black, draw.Src)
+		cross.Visualize(pw)
 	}
 }
 

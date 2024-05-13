@@ -8,8 +8,7 @@ import (
 	"github.com/roman-mazur/architecture-lab-3/painter"
 )
 
-type Parser struct {
-}
+type Parser struct{}
 
 func complexOperation(operation painter.OperationFunc) painter.Operation {
 	if operation == nil {
@@ -46,6 +45,7 @@ func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 
 	for scanner.Scan() {
 		commandLine := scanner.Text()
+
 		sliced := strings.Split(commandLine, " ")
 		args := sliced[1:]
 
