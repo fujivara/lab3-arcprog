@@ -28,13 +28,13 @@ func TestLoop_Post(t *testing.T) {
 		go l.Post(logOp(t, "do green fill", GreenFill))
 	}
 
-	l.Post(OperationFunc(func(screen.Texture) {
+	l.Post(OperationFunc(func(screen.Texture, *UI) {
 		testOps = append(testOps, "op 1")
-		l.Post(OperationFunc(func(screen.Texture) {
+		l.Post(OperationFunc(func(screen.Texture, *UI) {
 			testOps = append(testOps, "op 2")
 		}))
 	}))
-	l.Post(OperationFunc(func(screen.Texture) {
+	l.Post(OperationFunc(func(screen.Texture, *UI) {
 		testOps = append(testOps, "op 3")
 	}))
 
@@ -60,9 +60,9 @@ func TestLoop_Post(t *testing.T) {
 }
 
 func logOp(t *testing.T, msg string, op OperationFunc) OperationFunc {
-	return func(tx screen.Texture) {
+	return func(tx screen.Texture, ui *UI) {
 		t.Log(msg)
-		op(tx)
+		op(tx, ui)
 	}
 }
 
