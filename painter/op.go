@@ -2,7 +2,7 @@ package painter
 
 import (
 	"fmt"
-	"github.com/roman-mazur/architecture-lab-3/ui"
+	"github.com/fujivara/lab3-arcprog/ui"
 	"image"
 	"image/color"
 	"strconv"

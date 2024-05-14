@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/roman-mazur/architecture-lab-3/painter"
+	"github.com/fujivara/lab3-arcprog/painter"
 )
 
 type Parser struct{}

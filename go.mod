@@ -1,4 +1,4 @@
-module github.com/roman-mazur/architecture-lab-3
+module github.com/fujivara/lab3-arcprog
 
 go 1.22
 

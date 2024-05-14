@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 
-	"github.com/roman-mazur/architecture-lab-3/painter"
-	"github.com/roman-mazur/architecture-lab-3/painter/lang"
-	"github.com/roman-mazur/architecture-lab-3/ui"
+	"github.com/fujivara/lab3-arcprog/painter"
+	"github.com/fujivara/lab3-arcprog/painter/lang"
+	"github.com/fujivara/lab3-arcprog/ui"
 )
 
 func main() {
