@@ -1,0 +1,13 @@
+#!/bin/bash
+
+x="$1"
+y="$2"
+
+if [ -z "$x" ] || [ -z "$y" ]; then
+    echo "Usage: $0 <x> <y>"
+    exit 1
+fi
+
+curl -X POST -d "
+figure $x $y
+update" http://localhost:17000
