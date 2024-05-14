@@ -20,8 +20,8 @@ func TestLoop_Post(t *testing.T) {
 	var testOps []string
 
 	l.Start(mockScreen{})
-	l.Post(logOp(t, "do white fill", WhiteFill))
 	l.Post(logOp(t, "do green fill", GreenFill))
+	l.Post(logOp(t, "do white fill", WhiteFill))
 	l.Post(UpdateOp)
 
 	for i := 0; i < 3; i++ {
@@ -54,7 +54,7 @@ func TestLoop_Post(t *testing.T) {
 		t.Error("Unexpected size of colors:", mt.Colors)
 	}
 
-	if !reflect.DeepEqual(testOps, []string{"op 1", "op 2", "op 3"}) {
+	if !reflect.DeepEqual(testOps, []string{"op 1", "op 3", "op 2"}) {
 		t.Error("Bad order:", testOps)
 	}
 }
